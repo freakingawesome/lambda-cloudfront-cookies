@@ -1,6 +1,7 @@
 # lambda-cloudfront-cookies
 
 > AWS Lambda to protect your CloudFront content with username/passwords
+> NOTE: This is a less secure fork of [thumbsup/lambda-cloudfront-cookies](https://github.com/thumbsup/lambda-cloudfront-cookies), with all the KMS encryption stripped out. This version just stores the private key as an environment variable, unencrypted which is typically [a bad idea](https://diogomonica.com/2017/03/27/why-you-shouldnt-use-env-variables-for-secret-data/). Use with caution.
 
 ## How it works
 
@@ -39,22 +40,11 @@ Browser                   CloudFront             Lambda              S3
 
 ## Pre-requisites
 
-### 1. Encryption key
-
-- Create an encryption key in KMS, or choose one that you already have. Note that each KMS key costs $1/month.
-- Take note of the key ID.
-
-### 2. CloudFront key pair
+### 1. CloudFront key pair
 
 - Logging in with your AWS **root** account, generate a CloudFront key pair
 - Take note of the key pair ID
-- Download the private key, and encrypt it with KMS using
-
-```bash
-aws kms encrypt --key-id $KMS_KEY_ID --plaintext "$(cat pk-000000.pem)" --query CiphertextBlob --output text
-```
-
-- Write down the encrypted value, then secure the private key or delete it
+- Download the private key
 
 ### 3. Htpasswd
 
@@ -65,12 +55,6 @@ $ htpasswd -nB username
 New password: **********
 Re-type new password: **********
 username:$2a$08$eTTe9DM5N0w50CxL5OL0D.ToMtpAuip/4TCSWCSDJddoIW9gaQIym
-```
-
-- Encrypt your `htpasswd` file using KMS again
-
-```bash
-aws kms encrypt --key-id $KMS_KEY_ID --plaintext "$(cat htpasswd)" --query CiphertextBlob --output text
 ```
 
 ## Deployment
@@ -94,21 +78,15 @@ It should contain the following info - minus the comments:
   // if false, a successful login will return HTTP 200 (typically for Ajax calls)
   // if true, a successful login will return HTTP 302 to the Referer (typically for form submissions)
   "redirectOnSuccess=true",
-  // KMS key ID created in step 1
-  "kmsKeyId=00000000-0000-0000-0000-000000000000",
   // CloudFront key pair ID from step 2
   // This is not sensitive, and will be one of the cookie values
   "cloudFrontKeypairId=APK...",
 
-  // ------------------
-  // ENCRYPTED SETTINGS
-  // ------------------
+  // Unencrypted CloudFront private key from step 2
+  "cloudFrontPrivateKey=-----BEGIN RSA...",
 
-  // encrypted CloudFront private key from step 2
-  "encryptedCloudFrontPrivateKey=AQECAH...",
-
-  // encrypted contents of the <htpasswd> file from step 3
-  "encryptedHtpasswd=AQECAH..."
+  // Unencrypted contents of the <htpasswd> file from step 3
+  "htpasswd=username:lksdjfalk..."
 ]
 ```
 

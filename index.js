@@ -1,5 +1,3 @@
-// Note: no need to bundle <aws-sdk>, it's provided by Lambda
-const AWS = require('aws-sdk')
 const async = require('async')
 // const contentType = require('content-type')
 const qs = require('querystringparser')
@@ -15,8 +13,8 @@ const CONFIG_KEYS = {
   sessionDuration: 'SESSION_DURATION',
   redirectOnSuccess: 'REDIRECT_ON_SUCCESS',
   cloudFrontKeypairId: 'CLOUDFRONT_KEYPAIR_ID',
-  cloudFrontPrivateKey: 'ENCRYPTED_CLOUDFRONT_PRIVATE_KEY',
-  htpasswd: 'ENCRYPTED_HTPASSWD'
+  cloudFrontPrivateKey: 'CLOUDFRONT_PRIVATE_KEY',
+  htpasswd: 'HTPASSWD'
 }
 
 // --------------
@@ -34,7 +32,7 @@ exports.handler = (event, context, callback) => {
       body: 'Bad request'
     })
   }
-  // get and decrypt config values
+  // get config values
   async.mapValues(CONFIG_KEYS, getConfigValue, function (err, config) {
     if (err) {
       callback(null, {
@@ -98,20 +96,10 @@ function parsePayload (body, headers) {
 
 // --------------
 // Returns the corresponding config value
-// After decrypting it with KMS if required
 // --------------
 
 function getConfigValue (configName, target, done) {
-  if (/^ENCRYPTED/.test(configName)) {
-    const kms = new AWS.KMS()
-    const encrypted = process.env[configName]
-    kms.decrypt({ CiphertextBlob: new Buffer(encrypted, 'base64') }, (err, data) => {
-      if (err) done(err)
-      else done(null, data.Plaintext.toString('ascii'))
-    })
-  } else {
-    done(null, process.env[configName])
-  }
+  done(null, process.env[configName])
 }
 
 // --------------
