@@ -62,6 +62,9 @@ username:$2a$08$eTTe9DM5N0w50CxL5OL0D.ToMtpAuip/4TCSWCSDJddoIW9gaQIym
 Create a configuration file called `dist/config.json`, based on [config.example.json](config.example.json).
 Make sure you don't commit this file to source control (the `dist` folder is ignored).
 
+NOTE: AWS Lambda functions do not play well with environment variables that contain newlines. To workaround,
+this function will translate the character sequence `\n` to a newline.
+
 It should contain the following info - minus the comments:
 
 ```js
