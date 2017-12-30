@@ -99,7 +99,7 @@ function parsePayload (body, headers) {
 // --------------
 
 function getConfigValue (configName, target, done) {
-  done(null, process.env[configName].replace(/\\n/, '\n'))
+  done(null, process.env[configName].replace(/\\n/g, '\n'))
 }
 
 // --------------
