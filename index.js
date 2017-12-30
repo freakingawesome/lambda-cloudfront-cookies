@@ -108,7 +108,7 @@ function getConfigValue (configName, target, done) {
 // --------------
 
 function normaliseHeaders (headers) {
-  return Object.keys(headers).reduce((acc, key) => {
+  return Object.keys(headers || {}).reduce((acc, key) => {
     acc[key.toLowerCase()] = headers[key]
     return acc
   }, {})
