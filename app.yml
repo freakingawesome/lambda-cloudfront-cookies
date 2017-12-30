@@ -37,7 +37,6 @@ Resources:
       Handler: index.handler
       Runtime: nodejs4.3
       CodeUri: dist/lambda.zip
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           WEBSITE_DOMAIN: !Ref websiteDomain
