@@ -46,9 +46,9 @@ exports.handler = (event, context, callback) => {
           console.log('Successful login for: ' + body.username)
           var responseHeaders = cookiesHeaders(config)
           var statusCode = 200
-          if (config.redirectOnSuccess === 'true') {
+          if (body.next || config.redirectOnSuccess === 'true') {
             statusCode = 302
-            responseHeaders['Location'] = requestHeaders['referer'] || '/'
+            responseHeaders['Location'] = body.next || requestHeaders['referer'] || '/'
           }
           callback(null, {
             statusCode: statusCode,

@@ -80,6 +80,7 @@ It should contain the following info - minus the comments:
   "sessionDuration=86400",
   // if false, a successful login will return HTTP 200 (typically for Ajax calls)
   // if true, a successful login will return HTTP 302 to the Referer (typically for form submissions)
+  // alternatively, you can pass a url in the body named `next` to redirect on success
   "redirectOnSuccess=true",
   // CloudFront key pair ID from step 2
   // This is not sensitive, and will be one of the cookie values
